@@ -70,9 +70,6 @@ public class CoreProperties {
         Element headerElement = extractor.getElement(HEADER_TAG);
         setQuite(headerElement.getAttribute("Quite"));
         setSingleSearch(headerElement.getAttribute("SingleSearch"));
-        //setLogFileName(headerElement.getAttribute("LogFileName"));
-        //setLogLevel(headerElement.getAttribute("LogLevel"));
-        
         /* 
          * get variables
          * <Variable Name="TIMESTAMP" Type="Timestamp" Format="HH:mm:ss"/>
