@@ -157,7 +157,7 @@ public class httpStub {
         
       } catch (Exception e) {
         logger.error("Unable to listen on " + httpProperties.getServerIP() + ":" + httpProperties.getServerPort());
-        //e.printStackTrace();
+        e.printStackTrace();
         // exit on fail to bind port id.
         System.exit(1);
       }
@@ -191,7 +191,7 @@ public class httpStub {
           // has been issued
         } catch (Exception e) {
           logger.error("socket exception.");
-          //e.printStackTrace();
+          e.printStackTrace();
         } finally {
           
         }
