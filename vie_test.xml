@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VIFStub xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="\c:\temp\vif\schema\vif.xsd">
+<!-- Configuration Section -->
+
+        <HTTPServer Host="192.168.1.2" Port="9001" ThreadCount="1000"
+			SSLKeyStore="c:\temp\vif\ssl\Newkeystore.jks" 
+			SSLKeyPswd="password" 
+			SSLKeyStorePswd="password" 
+			SSLCertStore="certStore" 
+			SSLClientAuth="false"
+			Monitor="FALSE"/>
+
+<!-- version control -->
+<!-- v0.5 - Tim Lane - 07/02/2014 - initial version -->
+	<Core Author="Tim Lane" Name="ESG KISS V0.5" Description="ESG KISS Stub Port 9001" Date="07/02/2014">
+	<Header DefaultReceiver="SINK" 
+	Quiet="FALSE" SingleSearch="TRUE" 
+	LogFileName="D:\Dropbox\java\httpStub\log4j.properties"
+	LogLevel="INFO"/>
+
+<!-- test to skip reading body if header contains these strings, minimises read activity  -->
+	<ReadHeaderLine Name="appattribute.json" Type="regex"/>
+
+<!-- variable section -->
+	<Variable Name="TIMESTAMP" Type="Timestamp" Format="HH:mm:ss"/>
+	
+	
+	
+	<!--  "appId" : "cd537fd0-ea49-4a3e-85cb-9f6c0f11b705:c5536818-61ea-42d3-9d0e-34e67f5d7a51", -->
+	<Variable Name="appId" Type="Delimited" RightOf="appId&quot; : &quot;" LeftOf="&quot;"/> 
+
+	<!-- 2013 - 11 - 29T16 : 04 : 30Z -->
+	<Variable Name="createDate" Type="Timestamp" Format="yyyy.MM.dd"/>
+	<Variable Name="createTime" Type="Timestamp" Format="HH : mm"/>
+	<Variable Name="createTimePlusHour" Type="Timestamp" Format="HH:mm" Offset="3600"/>
+	<!-- 05222e32 - d8a8 - 4da0 - 9056 - 37186bd70ae3 -->
+	<Variable Name="randToken1" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%08x" />
+	<Variable Name="randToken2" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="randToken3" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />	
+	<Variable Name="randToken4" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="randToken5" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%012x" />
+	<!-- "bsb": "085397",, --> 
+	<Variable Name="bsb" Type="Delimited" RightOf="&quot;bsb&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- 	"" accountNickname "" : "" user9923 "", -->
+	<Variable Name="accountNickname" Type="Delimited" RightOf="&quot;accountNickname&quot;: &quot;" LeftOf="&quot;"/> 
+	<!-- "" direction "" : "" OUT "", -->
+	<Variable Name="direction" Type="Delimited" RightOf="&quot;direction&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" amount "" : "" 0.01 "", -->
+	<Variable Name="amount" Type="Delimited" RightOf="&quot;amount&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" description "" : "" 0.01 "", -->
+	<Variable Name="description" Type="Delimited" RightOf="&quot;description&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" id "" : "" 8786b409 - ff9b - 4df2 - b07d - d5e1687c3e5c "", -->
+	<Variable Name="randId1" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%08x" />
+	<Variable Name="randId2" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="randId3" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />	
+	<Variable Name="randId4" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="randId5" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%012x" />
+	<!-- "" Amount "" : "" 0.01 "", -->
+	<Variable Name="TransactionAmount" Type="Delimited" RightOf="&quot;Amount&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" Contact "" : "" 61412019912 "",' -->
+	<Variable Name="Contact" Type="Delimited" RightOf="&quot;Contact&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" type "" : "" SMS "" -->
+	<Variable Name="type" Type="Delimited" RightOf="&quot;type&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "" accountId "" : "" 576439923 "", -->
+	<Variable Name="accountId" Type="Delimited" RightOf="&quot;accountId&quot;: &quot;" LeftOf=" &quot;"/> 
+	<!-- "id": "1b949b9b-3e17-43e9-b31d-74f564403603", -->
+	<Variable Name="tokenId" Type="Delimited" RightOf="id&quot;: &quot;" LeftOf="&quot;"/> 
+	<!-- /kissapi/banking/nab/kiss/1b949b9b-3e17-43e9-b31d-74f564403603?v=4 -->
+	<!-- <Variable Name="accountToken" Type="Delimited" RightOf="kiss&#47;" LeftOf="&#63;v" DefaultValue="Account Token Not Found"/>  -->
+	<Variable Name="accountToken" Type="Positional" StartPosition="31" Length="32"/> 
+	<!-- "" accountToken "" : "" 221236d59f10c2cec3f1e4b31f86e751 "", -->
+	<Variable Name="accountTokenId1" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%08x" />
+	<Variable Name="accountTokenId2" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="accountTokenId3" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />	
+	<Variable Name="accountTokenId4" Type="RandomLong" RandMin="1" RandMax="9999" Format="%04x" />
+	<Variable Name="accountTokenId5" Type="RandomLong" RandMin="1" RandMax="99999999" Format="%012x" />
+	
+	
+<!-- Control Section -->
+
+<!-- stub test page, to call http://<ip>:<port>/test_page --> 	
+	<ReceiverEvent Name="TestPageRECEIVEREVENT" KeyType="STRING" KeyValue="test_page">
+		<EventMessage BaselineMessage="TestPageEVENTMESSAGE" WaitDistribution="UNIFORM" MinWait="10.0" MaxWait="11.0"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="TestPageEVENTMESSAGE"><![CDATA[TIMESTAMP--->%TIMESTAMP%<----TIMESTAMP---->Future Time--->%createTimePlusHour%<---]]></BaselineMessage>	
+
+
+<!-- stub test page, to call http://<ip>:<port>/test_page --> 	
+	<ReceiverEvent Name="TestPageRECEIVEREVENT" KeyType="STRING" KeyValue="test_page">
+		<EventMessage BaselineMessage="TestPageEVENTMESSAGE" WaitDistribution="UNIFORM" MinWait="0.5" MaxWait="1.0"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="TestPageEVENTMESSAGE"><![CDATA[randToken-->%randToken1%<-->APPID--->%appId%<---TIMESTAMP--->%TIMESTAMP%<----TIMESTAMP---->Future Time--->%createTimePlusHour%<---]]></BaselineMessage>	
+
+
+<!-- 3.7 ProcessTokenTrans-RIB-->	
+	<ReceiverEvent Name="3.7_ProcessTokenTrans-RIB" KeyType="REGEX" KeyValue="kiss\/.{8}.*transactions">
+		<EventMessage BaselineMessage="3.7_ProcessTokenTrans-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.7_ProcessTokenTrans-RIB"><![CDATA[{"status":{"code":"35","message":"Process confirm failed."},"token":{"status":"OPEN","createDate":"2013-12-03T05:28:17Z","createUser":"GARY MARTIN","own":false,"expiry":&#91;{"identifier":"SCAN","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"SMS","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"NFC","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"EMAIL","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"FACEBOOK","value":"2013-12-05T05:28:17Z","expired":false}&#93;,"id":"%tokenId%","direction":"IN","amount":"0.01","description":"Lunch","category":"Food","transactions":&#91;{"id":"875b8d08-aa8a-4122-af2c-fb8063181845","type":"NFC","amount":"0.01","description":"test","counterParty":"JAMES MARKER","status":"PROCESSED","processDate":"2013-12-03T05:28:23Z","srvrtId":"R9518741702","accountNickname":"user9922 testing length01","paymentMessage":"Payment processed.","expired":false,"active":false,"expiryDate":"2013-12-05T05:28:17Z","sortDate":"2013-12-03T05:28:23Z"}&#93;}}]]></BaselineMessage>	
+	
+<!-- 3.3 Create Token Transaction-RIB -->	
+	<ReceiverEvent Name="3.3_CreateTokenTransaction-RIB" KeyType="STRING" KeyValue="transactions?v=4">
+		<EventMessage BaselineMessage="3.3_CreateTokenTransaction-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.3_CreateTokenTransaction-RIB"><![CDATA[{	"status": {		"code":"3",		"message":"Token Transaction created."	},	"token": {		"accountToken":"221236d59f10c2cec3f1e4b31f86e751",		"receivedBalance":"0",		"status":"OPEN",		"createDate":"%createDate%T%createTime%Z",		"createUser":"JOHN23 MERCY23",		"own": true,		"expiry": &#91;{				"identifier":"SCAN",				"value":"%createDate%T%createTimePlusHour%Z",				"expired": false			}, {				"identifier":"SMS",				"value":"%createDate%T%createTimePlusHour%Z",				"expired": false			}, {				"identifier":"NFC",				"value":"%createDate%T%createTimePlusHour%Z",				"expired": false			}, {				"identifier":"EMAIL",				"value":"%createDate%T%createTimePlusHour%Z",				"expired": false			}, {				"identifier":"FACEBOOK",				"value":"%createDate%T%createTimePlusHour%Z",				"expired": false			}		&#93;,		"id":"%randToken1%-%randToken2%-%randToken3%-%randToken4%-%randToken5%",		"bsb":"%bsb%",		"accountNickname":"%accountNickname%",		"direction":"%direction%",		"amount":"%amount%",		"description":"%description",		"transactions": &#91;{				"id":"%randId1%-%randId2%-%randId3%-%randId4%-%randId5%",				"type":"%type%",				"contact":"%Contact%",				"amount":"%TransactionAmount%",				"counterParty":"",				"status":"OPEN",				"otp":"254336",				"expired": false,				"active": true,				"expiryDate":"%createDate%TcreateTimePlusHour%Z",				"sortDate":"%createDate%T%createTimePlusHour%Z"			}		&#93;,		"accountIdDisplay":"%accountId%"	}}]]></BaselineMessage>	
+
+<!-- 3.14 VerifyEmail-RIB -->	
+	<ReceiverEvent Name="3.14_VerifyEmail-RIB" KeyType="STRING" KeyValue="emailVerification">
+		<EventMessage BaselineMessage="3.14_VerifyEmail-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.14_VerifyEmail-RIB"><![CDATA[{"status":{"code":"9","message":"Your email has been successfully registered. You can now receive Flik payments to this email address."}}]]></BaselineMessage>	
+
+<!-- 3.13 RegAppSettings-RIB -->	
+	<ReceiverEvent Name="3.13_RegAppSettings-RIB" KeyType="STRING" KeyValue="termsAndConditions">
+		<EventMessage BaselineMessage="3.13_RegAppSettings-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.13_RegAppSettings-RIB"><![CDATA[{"status":{"code":"1","message":"Success"}}]]></BaselineMessage>	
+	
+<!-- 3.12 SetUserSettings-RIB -->	
+	<ReceiverEvent Name="3.12_SetUserSettings-RIB" KeyType="STRING" KeyValue="settingsRequest">
+		<EventMessage BaselineMessage="3.12_SetUserSettings-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.12_SetUserSettings-RIB"><![CDATA[{"status":{"code":"1","message":"Success"}}]]></BaselineMessage>	
+	
+<!-- 3.11 ClaimStep2-RIB -->	
+	<ReceiverEvent Name="3.11_ClaimStep2-RIB" KeyType="STRING" KeyValue="claim?v=3">
+		<EventMessage BaselineMessage="3.11_ClaimStep2-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.11_ClaimStep2-RIB"><![CDATA[{"status":{"code":"4","message":"Token Transaction confirmed OK."},"claimResponse":{"processDate":"2013-11-29T16:04:42Z","status":"PROCESSED"}}]]></BaselineMessage>	
+	
+<!-- 3.10 ClaimStep1-RIB -->	
+	<ReceiverEvent Name="3.10_ClaimStep1-RIB" KeyType="STRING" KeyValue="claim?v=2">
+		<EventMessage BaselineMessage="3.10_ClaimStep1-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.10_ClaimStep1-RIB"><![CDATA[{"status":{"code":"1","message":"Success"},"token":{"createDate":"2013-11-29T16:04:30Z","createUser":"JOHN23 MERCY23","amount":"0.01","description":"SEND","transactions":&#91;{"expired":false,"active":false}&#93;}}]]></BaselineMessage>	
+
+
+<!-- 3.6 CreateToken-RIB -->	
+	<ReceiverEvent Name="3.6_CreateToken-RIB" KeyType="STRING" KeyValue="kiss?v=4">
+		<EventMessage BaselineMessage="3.6_CreateToken-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.6_CreateToken-RIB"><![CDATA[{"status":{"code":"2","message":"Token created."},"token":{"accountToken":"%randToken1%%randToken2%%randToken3%%randToken4%%randToken5%","receivedBalance":"0","status":"OPEN","createDate":"2013-12-03T05:28:17Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"SMS","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"NFC","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"EMAIL","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"FACEBOOK","value":"2013-12-05T05:28:17Z","expired":false}&#93;,"id":"%randToken1%-%randToken2%-%randToken3%-%randToken4%-%randToken5%","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"0.01","description":"Lunch","category":"Food","accountIdDisplay":"576439921"}}]]></BaselineMessage>	
+		
+<!-- 3.9  GetNumTokensByType-RIB -->	
+	<ReceiverEvent Name="3.9_GetNumTokensByType-RIB" KeyType="STRING" KeyValue="/count/ALL?v=1">
+		<EventMessage BaselineMessage="3.9_GetNumTokensByType-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.9_GetNumTokensByType-RIB"><![CDATA[{"status":{"code":"1","message":"Success"},"queryCount":{"count":18}}]]></BaselineMessage>	
+	
+<!-- 3.8 GetTokenDetails-RIB -->
+<!-- regex matches on /kissapi/banking/nab/kiss/1b949b9b-3e17-43e9-b31d-74f564403603?v=4 -->	
+	<ReceiverEvent Name="3.8_GetTokenDetails-RIB" KeyType="REGEX" KeyValue=".*kiss\/.{8}.*?v=4">
+		<EventMessage BaselineMessage="3.8_GetTokenDetails-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.8_GetTokenDetails-RIB"><![CDATA[{"status":{"code":"1","message":"Success"},"token":{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-12-03T05:28:17Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"SMS","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"NFC","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"EMAIL","value":"2013-12-05T05:28:17Z","expired":false},{"identifier":"FACEBOOK","value":"2013-12-05T05:28:17Z","expired":false}&#93;,"id":"%accountToken%","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"0.01","description":"Lunch","category":"Food","transactions":&#91;&#93;,"accountIdDisplay":"576439921"}}]]></BaselineMessage>	
+
+<!-- 3.5 GetUserSettings-RIB -->	
+	<ReceiverEvent Name="3.5_GetUserSettings" KeyType="STRING" KeyValue="settings">
+		<EventMessage BaselineMessage="3.5_GetUserSettings" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.5_GetUserSettings"><![CDATA[{"status":{"code":"1","message":"Success"},"settingsResponse":&#91;{"identifier":"firstName","value":"JAMES","category":"PROFILE"},{"identifier":"lastName","value":"MARKER","category":"PROFILE"},{"identifier":"mobile","value":"XXXX XXX 922","category":"PROFILE"},{"identifier":"photoDisplay","value":"Y","category":"FACEBOOK"},{"identifier":"photoEnable","value":"Y","category":"FACEBOOK"},{"identifier":"expiryEmail","value":-1,"category":"EXPIRY_TIME"},{"identifier":"expirySms","value":-1,"category":"EXPIRY_TIME"},{"identifier":"expiryNfc","value":-1,"category":"EXPIRY_TIME"},{"identifier":"expiryScan","value":-1,"category":"EXPIRY_TIME"},{"identifier":"expiryFacebook","value":-1,"category":"EXPIRY_TIME"},{"identifier":"maxTransactionsPerToken","value":-1,"category":"TRANSACTION_LIMIT"},{"identifier":"maxTransactionsPerDay","value":-1,"category":"TRANSACTION_LIMIT"},{"identifier":"isEmailVerified","value":"false","category":"EMAIL"},{"identifier":"email","category":"EMAIL"},{"identifier":"acceptedTnCVersion","value":"13","category":"TERMS_CONDITIONS"},{"identifier":"acceptedTnCUrl","value":"http://www.nab.com.au/static/mobile/flik/terms-conditions.html","category":"TERMS_CONDITIONS"}&#93;}]]></BaselineMessage>	
+
+<!-- 3.4 GetUserSettings-RIB -->	
+	<ReceiverEvent Name="3.4_GetListTokenTrans-RIB" KeyType="STRING" KeyValue="type=HISTORY">
+		<EventMessage BaselineMessage="3.4_GetListTokenTrans-RIB" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.4_GetListTokenTrans-RIB"><![CDATA[{"status":{"code":"1","message":"Success"&#125;,"tokenListResult":{"hasMore":true,"searchStart":"20131120100644399","tokens":&#91;{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-12-03T05:28:17Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-12-05T05:28:17Z","expired":false&#125;,{"identifier":"SMS","value":"2013-12-05T05:28:17Z","expired":false&#125;,{"identifier":"NFC","value":"2013-12-05T05:28:17Z","expired":false&#125;,{"identifier":"EMAIL","value":"2013-12-05T05:28:17Z","expired":false&#125;,{"identifier":"FACEBOOK","value":"2013-12-05T05:28:17Z","expired":false&#125;&#93;,"id":"1b949b9b-3e17-43e9-b31d-74f564403603","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"0.01","description":"Lunch","category":"Food","transactions":&#91;{"id":"875b8d08-aa8a-4122-af2c-fb8063181845","type":"NFC","amount":"0.01","description":"test","counterParty":"JAMES MARKER","status":"FAILED","processDate":"2013-12-03T05:28:23Z","srvrtId":"R9518741702","accountNickname":"user9922 testing length01","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":false,"active":false,"expiryDate":"2013-12-05T05:28:17Z","sortDate":"2013-12-03T05:28:23Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-12-03T05:21:42Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-12-05T05:21:42Z","expired":false&#125;,{"identifier":"SMS","value":"2013-12-05T05:21:42Z","expired":false&#125;,{"identifier":"NFC","value":"2013-12-05T05:21:42Z","expired":false&#125;,{"identifier":"EMAIL","value":"2013-12-05T05:21:42Z","expired":false&#125;,{"identifier":"FACEBOOK","value":"2013-12-05T05:21:42Z","expired":false&#125;&#93;,"id":"e89c2831-94a0-42d0-a62e-0694a8cdb0c4","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"0.01","description":"Lunch","category":"Food","transactions":&#91;{"id":"3b46d446-3985-4fd9-8a32-03d512ce0173","type":"NFC","amount":"0.01","description":"test","counterParty":"JAMES MARKER","status":"FAILED","processDate":"2013-12-03T05:21:51Z","srvrtId":"Z9518940702","accountNickname":"user9922 testing length01","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":false,"active":false,"expiryDate":"2013-12-05T05:21:42Z","sortDate":"2013-12-03T05:21:51Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"status":"PROCESSED","createDate":"2013-11-25T22:51:59Z","createUser":"MARIO PESTANA","own":false,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-27T22:51:59Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-27T22:51:59Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-27T22:51:59Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-27T22:51:59Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-27T22:51:59Z","expired":true&#125;&#93;,"id":"4eb38540-e660-401b-be23-1f4c44ca24ff","direction":"OUT","amount":"45.07","description":"Entertainmeba","transactions":&#91;{"id":"ed47a2d5-518b-419f-b352-abc80cab080e","type":"SMS","contact":"61469551880","amount":"45.07","counterParty":"GARY MARTIN","status":"PROCESSED","processDate":"2013-11-25T13:00:00Z","srvrtId":"M9520741968","accountNickname":"Personal Account #7177","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":false,"active":false,"expiryDate":"2013-11-27T22:51:59Z","sortDate":"2013-11-25T13:00:00Z"&#125;&#93;&#125;,{"status":"PROCESSED","createDate":"2013-11-25T03:18:40Z","createUser":"MARIO PESTANA","own":false,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-27T03:18:40Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-27T03:18:40Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-27T03:18:40Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-27T03:18:40Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-27T03:18:40Z","expired":true&#125;&#93;,"id":"1efad026-4cff-44c9-9fdc-d69a982a0b04","direction":"OUT","amount":"55.08","description":"batch","transactions":&#91;{"id":"4dc01acc-c456-40cc-bb93-9ce0ed501f6f","type":"SMS","contact":"61469551880","amount":"55.08","counterParty":"GARY MARTIN","status":"PROCESSED","processDate":"2013-11-24T13:00:00Z","srvrtId":"X9720721938","accountNickname":"Personal Account #7177","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":false,"active":false,"expiryDate":"2013-11-27T03:18:40Z","sortDate":"2013-11-24T13:00:00Z"&#125;&#93;&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:27:46Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:27:46Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:27:46Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:27:46Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:27:46Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:27:46Z","expired":true&#125;&#93;,"id":"310fa2e9-45c2-44bd-956d-2b73148be7e0","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"2.00","description":"Entertainment","transactions":&#91;{"id":"7a006928-54e9-4ef7-ba23-44eb7236c4d3","type":"EMAIL","contact":"ivy.huynh@nab.com.au","amount":"2.00","counterParty":"Ivy Huynh","status":"EXPIRED","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":true,"active":false,"expiryDate":"2013-11-21T23:27:46Z","sortDate":"2013-11-19T23:27:46Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:27:16Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:27:16Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:27:16Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:27:16Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:27:16Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:27:16Z","expired":true&#125;&#93;,"id":"bf104fec-9718-4934-afdb-698ff4912d1d","bsb":"085397","accountNickname":"Personal Account #7177","direction":"OUT","amount":"2.00","description":"Entertainment","transactions":&#91;{"id":"5a018aaa-f91b-4847-bb54-7b586d4f100c","type":"EMAIL","contact":"ivy.huynh@nab.com.au","amount":"2.00","counterParty":"Ivy Huynh","status":"EXPIRED","paymentMessage":"Payment error occurred.","expired":true,"active":false,"expiryDate":"2013-11-21T23:27:16Z","sortDate":"2013-11-19T23:27:16Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:25:02Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:25:02Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:25:02Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:25:02Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:25:02Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:25:02Z","expired":true&#125;&#93;,"id":"9267e8d2-6308-4168-a94c-933bdc9e7b9a","bsb":"085397","accountNickname":"Personal Account #7177","direction":"OUT","amount":"2.00","description":"Entertainment","transactions":&#91;{"id":"9b55d880-919a-4358-8184-1b9179b45427","type":"SMS","contact":"61457069303","amount":"2.00","counterParty":"Ivy Huynh","status":"EXPIRED","paymentMessage":"Payment error occurred.","expired":true,"active":false,"expiryDate":"2013-11-21T23:25:02Z","sortDate":"2013-11-19T23:25:02Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:24:00Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:24:00Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:24:00Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:24:00Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:24:00Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:24:00Z","expired":true&#125;&#93;,"id":"f65b7f0f-dc84-40bd-bc6e-9580a1b7e3e8","bsb":"085397","accountNickname":"Personal Account #7177","direction":"OUT","amount":"2.00","description":"Entertainment","transactions":&#91;{"id":"35293fe2-272f-4027-859f-e7d752727004","type":"SMS","contact":"61457069303","amount":"2.00","counterParty":"Ivy Huynh","status":"EXPIRED","paymentMessage":"Payment error occurred.","expired":true,"active":false,"expiryDate":"2013-11-21T23:24:00Z","sortDate":"2013-11-19T23:24:00Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:21:44Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:21:44Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:21:44Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:21:44Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:21:44Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:21:44Z","expired":true&#125;&#93;,"id":"77238099-b18d-4880-942e-718ab2d9f9f4","bsb":"085397","accountNickname":"Personal Account #7177","direction":"IN","amount":"2.00","description":"Travel","transactions":&#91;{"id":"428f109f-e64d-4cfa-8124-8849377bd41a","type":"EMAIL","contact":"ivy.huynh@nab.com.au","amount":"2.00","counterParty":"Ivy Huynh","status":"EXPIRED","paymentMessage":"Payment error occurred. Please contact the sender to arrange an alternative payment method.","expired":true,"active":false,"expiryDate":"2013-11-21T23:21:44Z","sortDate":"2013-11-19T23:21:45Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;,{"accountToken":"061ba3a559907e82c51e18e3741f34ae","receivedBalance":"0","status":"OPEN","createDate":"2013-11-19T23:06:44Z","createUser":"GARY MARTIN","own":true,"expiry":&#91;{"identifier":"SCAN","value":"2013-11-21T23:06:44Z","expired":true&#125;,{"identifier":"SMS","value":"2013-11-21T23:06:44Z","expired":true&#125;,{"identifier":"NFC","value":"2013-11-21T23:06:44Z","expired":true&#125;,{"identifier":"EMAIL","value":"2013-11-21T23:06:44Z","expired":true&#125;,{"identifier":"FACEBOOK","value":"2013-11-21T23:06:44Z","expired":true&#125;&#93;,"id":"078a6b44-5e5e-4cf8-8761-fe771ef676eb","bsb":"085397","accountNickname":"Personal Account #7177","direction":"OUT","amount":"2.00","description":"Concerts","transactions":&#91;{"id":"50025a95-9f85-4c90-9f05-5716db98d7a2","type":"EMAIL","contact":"d@e.com","amount":"2.00","counterParty":"Laura Molony","status":"EXPIRED","paymentMessage":"Payment error occurred.","expired":true,"active":false,"expiryDate":"2013-11-21T23:06:44Z","sortDate":"2013-11-19T23:06:44Z"&#125;&#93;,"accountIdDisplay":"576439921"&#125;&#93;&#125;&#125;]]></BaselineMessage>	
+	
+
+<!-- 3.2 GetCustAcctList-RIB -->
+	<ReceiverEvent Name="3.2_GetCustAcctList-RIB" KeyType="STRING" KeyValue="accounts?v=1">
+		<EventMessage BaselineMessage="3.2_GetCustAcctList-RIB" WaitDistribution="UNIFORM"  DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.2_GetCustAcctList-RIB"><![CDATA[{	"status": {		"code":"1",		"message":"Success"	},	"accounts": &#91;{			"bsb":"085397",			"accountIdDisplay":"576439922",			"type":"DDA",			"nickname":"user9922 testing length01",			"accountToken":"4be045b965581a25ae6a7be8982c38df",			"availableBalance":"40.00",			"currentBalance":"40.00"		}, {			"bsb":"085397",			"accountIdDisplay":"576017871",			"type":"DDA",			"nickname":"0085397576017871",			"accountToken":"13b557593645a95ad841510f9b90baa4",			"availableBalance":"2010.50",			"currentBalance":"2010.50"		}, {			"bsb":"085397",			"accountIdDisplay":"576433610",			"type":"DDA",			"nickname":"user9918",			"accountToken":"e4e8394628ae155b27853f177167ee4f",			"availableBalance":"10068.05",			"currentBalance":"10068.05"		}	&#93;}]]></BaselineMessage>	
+<!-- 3.2 GetCustAcctList-RIB -->
+<ReceiverEvent Name="3.2_GetCustAcctList-RIB" KeyType="STRING" KeyValue="accounts">
+		<EventMessage BaselineMessage="3.2_GetCustAcctList-RIB" WaitDistribution="UNIFORM"  DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.2_GetCustAcctList-RIB"><![CDATA[{	"status": {		"code":"1",		"message":"Success"	},	"accounts": &#91;{			"bsb":"085397",			"accountIdDisplay":"576439922",			"type":"DDA",			"nickname":"user9922 testing length01",			"accountToken":"4be045b965581a25ae6a7be8982c38df",			"availableBalance":"40.00",			"currentBalance":"40.00"		}, {			"bsb":"085397",			"accountIdDisplay":"576017871",			"type":"DDA",			"nickname":"0085397576017871",			"accountToken":"13b557593645a95ad841510f9b90baa4",			"availableBalance":"2010.50",			"currentBalance":"2010.50"		}, {			"bsb":"085397",			"accountIdDisplay":"576433610",			"type":"DDA",			"nickname":"user9918",			"accountToken":"e4e8394628ae155b27853f177167ee4f",			"availableBalance":"10068.05",			"currentBalance":"10068.05"		}	&#93;}]]></BaselineMessage>	
+
+<!-- 3.1 InitialiseApp-RIB -->
+	<ReceiverEvent Name="3.1_InitialiseApp-RIB" KeyType="STRING" KeyValue="appattribute">
+		<EventMessage BaselineMessage="3.1_InitialiseApp-RIB" WaitDistribution="UNIFORM" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8" DecodeEscape="TRUE"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.1_InitialiseApp-RIB"><![CDATA[{    "status": {        "code": "1",        "message": "Success"    },    "appAttributes": &#91;        {            "identifier": "currentTermsAndConditionsVersion",            "value": "13"        },        {            "identifier": "expiryEmail",            "value": "172800"        },        {            "identifier": "expirySms",            "value": "172800"        },        {            "identifier": "expiryNfc",            "value": "172800"        },        {            "identifier": "expiryScan",            "value": "172800"        },        {            "identifier": "expiryFacebook",            "value": "172800"        },        {            "identifier": "minTermsAndConditionsVersion",            "value": "12"        },        {            "identifier": "timeoutReturnToForeground",            "value": "600"        },        {            "identifier": "maxTransactionsPerToken",            "value": "10"        },        {            "identifier": "maxTransactionsPerDay",            "value": "40"        },        {            "identifier": "statementReferencePrefix",            "value": "Flik"        },        {            "identifier": "status",            "value": "ACTIVE"        },        {            "identifier": "android-currentVersion",            "value": "1.0"        },        {            "identifier": "android-minVersion",            "value": "1.0"        },        {            "identifier": "ios-currentVersion",            "value": "2.5"        },        {            "identifier": "ios-minVersion",            "value": "1.0"        },        {            "identifier": "statementReference",            "value": "Flik"        },        {            "identifier": "termsAndConditionsURL",            "value": "http: //www.nab.com.au/static/mobile/flik/terms-conditions.html"        }    &#93;}]]></BaselineMessage>	
+
+<!-- IB specific -->
+<!-- stub config section -->	
+<!-- 3.2_GetBalSingleAcct-RIB -->	
+	<ReceiverEvent Name="3.2_GetBalSingleAcct-RIB" KeyType="REGEX" KeyValue="account.*balance">
+		<EventMessage BaselineMessage="3.2_GetBalSingleAcct-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.2_GetBalSingleAcct-RIB"><![CDATA[{"account":{"accountId":"576439923","bankId":"085","branchId":"397","description":"user9923","encodedAccountId":"221236d59f10c2cec3f1e4b31f86e751","type":"DDA"},"availableBalance":{"credit":true,"debit":false,"value":"5710000.66"},"currentBalance":{"credit":true,"debit":false,"value":"5710000.66"}}]]></BaselineMessage>	
+
+<!-- 3.3_DeviceRegisterStep1-RIB -->	
+	<ReceiverEvent Name="3.3_DeviceRegisterStep1-RIB" KeyType="STRING" KeyValue="registration?v=1">
+		<EventMessage BaselineMessage="3.3_DeviceRegisterStep1-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.3_DeviceRegisterStep1-RIB"><![CDATA[{"registrationResponse":{"phone":"XXXX XXX 922","transactionId":"a273c656-aa13-4ef8-94ed-abdd42a337d1","passcodeAuthAvailable":"blocked","deviceRegId":"a273c656-aa13-4ef8-94ed-abdd42a337d1"}}]]></BaselineMessage>
+	
+<!-- 3.4_DeviceRegisterStep2-RIB -->	
+	<ReceiverEvent Name="3.4_DeviceRegisterStep2-RIB" KeyType="STRING" KeyValue="registration?v=2">
+		<EventMessage BaselineMessage="3.4_DeviceRegisterStep2-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.4_DeviceRegisterStep2-RIB"><![CDATA[.]]></BaselineMessage>	
+
+<!-- 3.5_DeviceCheck-RIB -->	
+	<ReceiverEvent Name="3.5_DeviceCheck-RIB" KeyType="REGEX" KeyValue="GET.*device">
+		<EventMessage BaselineMessage="3.5_DeviceCheck-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.5_DeviceCheck-RIB"><![CDATA[{"deviceResponse":{"passcodeEnabled":"K"}}]]></BaselineMessage>	
+	
+<!-- 3.6_De-registerDevice-RIB -->	
+	<ReceiverEvent Name="3.6_De-registerDevice-RIB" KeyType="STRING" KeyValue="DELETE">
+		<EventMessage BaselineMessage="3.6_De-registerDevice-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.6_De-registerDevice-RIB"><![CDATA[{"status":{"code":"IB-000","message":"OK"}}]]></BaselineMessage>	
+
+<!-- 3.7_UpdatePasscode-RIB -->	
+	<ReceiverEvent Name="3.7_UpdatePasscode-RIB" KeyType="STRING" KeyValue="changeOrResetOrCreatePasscode">
+		<EventMessage BaselineMessage="3.7_UpdatePasscode-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.7_UpdatePasscode-RIB"><![CDATA[.]]></BaselineMessage>	
+	
+<!-- 3.8_PasscodeStatus-RIB -->	
+	<ReceiverEvent Name="3.8_PasscodeStatus-RIB" KeyType="REGEX" KeyValue="passcode.*state">
+		<EventMessage BaselineMessage="3.8_PasscodeStatus-RIB" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.8_PasscodeStatus-RIB"><![CDATA[{"status":{"code":"IB-000","message":"OK"}}]]></BaselineMessage>	
+
+<!-- 3.1 Login-RIB and 3.9_Service Login-RIB -->	
+
+	<ReceiverEvent Name="3.1_9_Service Login-RIB_1" KeyType="REGEX" KeyValue="(?s)credentials.*username" >
+		<EventMessage BaselineMessage="3.1_9_Service Login-RIB_1" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.1_9_Service Login-RIB_1"><![CDATA[{"user":{"nin":"%userName%"}}]]></BaselineMessage>	
+
+	<ReceiverEvent Name="3.1_9_Service Login-RIB_2" KeyType="REGEX" KeyValue="(?s)credentials.*deviceRegId">
+		<EventMessage BaselineMessage="3.1_9_Service Login-RIB_2" WaitDistribution="UNIFORM" MinWait="1.0" MaxWait="2.2" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="3.1_9_Service Login-RIB_2"><![CDATA[{"user":{"nin":"12019922"}}]]></BaselineMessage>
+
+<!-- turns logging on and off, to call http://<ip>:<port>/LOG_ON!, http://<ip>:<port>/LOG_OFF! --> 	
+	<ReceiverEvent Name="LogOn" KeyType="STRING" KeyValue="LOG_ON!">
+		<EventMessage BaselineMessage="LogOn" WaitDistribution="UNIFORM"  DecodeEscape="TRUE" MinWait="0.0" MaxWait="0.0"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="LogOn"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>Test Page </title><body>	<h1>Logging Enabled</h1><br><p>Time:%TIMESTAMP%</p></body></html>]]></BaselineMessage>
+	
+	<ReceiverEvent Name="LogOff" KeyType="STRING" KeyValue="LOG_OFF!">
+		<EventMessage BaselineMessage="LogOff" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.0" MaxWait="0.0"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="LogOff"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><title>Test Page </title><body>	<h1>Logging Disabled</h1><br><p>Time:%TIMESTAMP%</p></body></html>]]></BaselineMessage>
+
+<!-- default response message if no matches are found, needs to be last message -->
+		
+	<ReceiverEvent Name="defaultMsg" KeyType="STRING" KeyValue="HTTP">
+		<EventMessage BaselineMessage="defaultMsg" OutputOverride="200" WaitDistribution="UNIFORM" DecodeEscape="TRUE" MinWait="0.5" MaxWait="1.0" ContentType="Content-Type: application/json; charset=utf-8"/>
+	</ReceiverEvent>
+	<BaselineMessage Name="defaultMsg"><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body>You have got a default response of HTTP500</soapenv:Body></soapenv:Envelope>]]></BaselineMessage>	
+
+
+	</Core>
+        
+</VIFStub>
