@@ -3,7 +3,7 @@
 <!-- Configuration Section -->
 
         <HTTPServer Host="192.168.1.2" Port="9001" ThreadCount="1000"
-			SSLKeyStore="c:\temp\vif\ssl\Newkeystore.jks" 
+			SSLKeyStore="E:\Users\Tim\Documents\GitHub\httpStub\keystore.jks" 
 			SSLKeyPswd="password" 
 			SSLKeyStorePswd="password" 
 			SSLCertStore="certStore" 
@@ -80,7 +80,7 @@
 
 <!-- stub test page, to call http://<ip>:<port>/test_page --> 	
 	<ReceiverEvent Name="TestPageRECEIVEREVENT" KeyType="STRING" KeyValue="test_page">
-		<EventMessage BaselineMessage="TestPageEVENTMESSAGE" WaitDistribution="UNIFORM" MinWait="10.0" MaxWait="11.0"/>
+		<EventMessage BaselineMessage="TestPageEVENTMESSAGE" WaitDistribution="UNIFORM" MinWait="5.0" MaxWait="6.0"/>
 	</ReceiverEvent>
 	<BaselineMessage Name="TestPageEVENTMESSAGE"><![CDATA[TIMESTAMP--->%TIMESTAMP%<----TIMESTAMP---->Future Time--->%createTimePlusHour%<---]]></BaselineMessage>	
 

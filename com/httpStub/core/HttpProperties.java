@@ -21,11 +21,21 @@ public class HttpProperties {
   private int ServerBacklog;
   private String configFileName;
   private int threadCount;
+  private String sslKeyStore;
+  private String sslKeyPswd;
+  private String sslKeyStorePswd;
+  private String sslCertStore;
+  private boolean sslClientAuth;
   
   public static final String HOST_TAG = "Host";
   public static final String PORT_TAG = "Port";
   public static final String THREAD_COUNT_TAG = "ThreadCount";
-  
+  public static final String SSL_KEY_STORE_TAG = "SSLKeyStore";
+  public static final String SSL_KEY_PASSWORD_TAG = "SSLKeyPswd";
+  public static final String SSL_KEY_STORE_PASSWORD_TAG = "SSLKeyStorePswd";
+  public static final String SSL_CERT_STORE_TAG = "SSLCertStore";
+  public static final String SSL_CLIENT_AUTH_TAG = "SSLClientAuth";
+       
   
   boolean testFlag = false;
   
@@ -34,6 +44,11 @@ public class HttpProperties {
     setServerIP(httpReceiverElement.getAttribute(HOST_TAG));
     setServerPort(httpReceiverElement.getAttribute(PORT_TAG));
     setThreadCount(httpReceiverElement.getAttribute(THREAD_COUNT_TAG));
+    setSslKeyStore(httpReceiverElement.getAttribute(SSL_KEY_STORE_TAG));
+    setSslKeyPswd(httpReceiverElement.getAttribute(SSL_KEY_PASSWORD_TAG));
+    setSslKeyStorePswd(httpReceiverElement.getAttribute(SSL_KEY_STORE_PASSWORD_TAG));
+    setSslCertStore(httpReceiverElement.getAttribute(SSL_CERT_STORE_TAG));
+    setSslClientAuth(httpReceiverElement.getAttribute(SSL_CLIENT_AUTH_TAG));
     
   }
   
@@ -44,13 +59,70 @@ public class HttpProperties {
   public int getThreadCount(){
     return threadCount;
   }
-  
+     
   public void setServerIP(String serverIP){
     this.serverIP = serverIP;
   }
   
   public String getServerIP(){
     return serverIP;
+  }
+  
+  // setSslKeyStore
+  
+  public void setSslKeyStore(String sslKeyStore){
+    this.sslKeyStore = sslKeyStore;
+  }
+  
+  public String getSslKeyStore(){
+    return sslKeyStore;
+  }
+  
+  // sslKeyPswd
+  
+  public void setSslKeyPswd(String sslKeyPswd){
+    this.sslKeyPswd = sslKeyPswd;
+  }
+  
+  public String getSslKeyPswd(){
+    return sslKeyPswd;
+  }
+  
+  // sslKeyStorePswd
+    
+  
+  public void setSslKeyStorePswd(String sslKeyStorePswd){
+    this.sslKeyStorePswd = sslKeyStorePswd;
+  }
+  
+  public String getSslKeyStorePswd(){
+    return sslKeyStorePswd;
+  }
+  
+  // sslCertStore
+  
+  public void setSslCertStore(String sslCertStore){
+    this.sslCertStore = sslCertStore;
+  }
+  
+  public String getSslCertStore(){
+    return sslCertStore;
+  }
+  
+  // sslClientAuth
+  
+  
+  public boolean setSslClientAuth(String sslClientAuth){
+    if (sslClientAuth.toUpperCase().matches("TRUE")){
+      return this.sslClientAuth = true;
+    } else {
+      return this.sslClientAuth = false;
+    }
+  
+  }
+
+  public boolean getSslClientAuth(){
+    return sslClientAuth;
   }
   
    public void setConfigFileName(String configFileName){

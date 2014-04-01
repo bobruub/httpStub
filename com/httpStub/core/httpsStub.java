@@ -34,8 +34,18 @@ import java.io.InputStream;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.ServerSocket;
+import java.security.KeyStore;
+import java.security.Security;
 
-public class httpStub {
+public class httpsStub {
   
   private HttpProperties httpProperties;
   private ServerSocket serverSocket;
@@ -43,14 +53,14 @@ public class httpStub {
   private LogFileProperties logFileProperties;
   private static String httpVersion = "1.0a";
   
-  // Create an HTTPStub for a particular TCP port
-  public httpStub(HttpProperties httpProperties, LogFileProperties logFileProperties)
+  // Create an HTTPS Stub for a particular TCP port
+  public httpsStub(HttpProperties httpProperties, LogFileProperties logFileProperties)
   {
     this.httpProperties = httpProperties;
     this.logFileProperties = logFileProperties;
   }
     
-  static Logger logger = Logger.getLogger(httpStub.class);
+  static Logger logger = Logger.getLogger(httpsStub.class);
   public static void main(String[] args) {
     
     /*
@@ -64,7 +74,7 @@ public class httpStub {
       configFileName = args[0];
       System.out.println("using config file: " + configFileName);
     } else {
-      configFileName = "d:\\dropbox\\java\\httpstub\\vie_test.xml";
+      configFileName = "E:\\Users\\Tim\\Documents\\GitHub\\httpStub\\vie_test.xml";
       System.out.println("using default config file: " + configFileName);
     } 
     
@@ -84,10 +94,10 @@ public class httpStub {
       System.out.println("log config file : " + logFileProperties.getLogFileName()); 
       PropertyConfigurator.configure(logFileProperties.getLogFileName());
       System.out.println("Log4j appender configuration is successful");
-      logger.info("non SSL version " + httpVersion);
+      logger.info("SSL version " + httpVersion);
       
-      httpStub httpStub = new httpStub(httpProperties, logFileProperties);
-      httpStub.RunIsolator();
+      httpsStub httpsStub = new httpsStub(httpProperties, logFileProperties);
+      httpsStub.RunIsolator();
     } catch (Exception e) {
       logger.error("error extracting XML file " + configFileName);
       //e.printStackTrace();
@@ -96,12 +106,37 @@ public class httpStub {
    
   }
     
-    ServerSocket getServerSocket() throws Exception {
-        logger.info("Preparing a regular HTTP Server Socket on server:port " + httpProperties.getServerIP() + ":" + httpProperties.getServerPort());
-        return new ServerSocket (httpProperties.getServerPort(),
-                                 httpProperties.getServerBacklog(), 
-                                 InetAddress.getByName(httpProperties.getServerIP()));
-
+ServerSocket getSslServerSocket() throws Exception
+    {
+        logger.info("Preparing SSL Server socket on Host " + httpProperties.getServerIP() + " Port " + httpProperties.getServerPort());
+        // Make sure that JSSE is available
+        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        // A keystore is where keys and certificates are kept
+        // Both the keystore and individual private keys should be password protected
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        
+        logger.info("Opening SSL Key Store " + httpProperties.getSslKeyStore() + " with password: " + httpProperties.getSslKeyPswd());
+        keystore.load(new FileInputStream(httpProperties.getSslKeyStore()), httpProperties.getSslKeyPswd().toCharArray());
+       
+        // A KeyManagerFactory is used to create key managers
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        // Initialize the KeyManagerFactory to work with our keystore
+        logger.info("Accessing KeyManageFactory with password " + httpProperties.getSslKeyPswd());
+        kmf.init(keystore, httpProperties.getSslKeyPswd().toCharArray());
+        // An SSLContext is an environment for implementing JSSE
+        // It is used to create a ServerSocketFactory
+        SSLContext sslc = SSLContext.getInstance("SSLv3");
+        // Initialize the SSLContext to work with our key managers
+        sslc.init(kmf.getKeyManagers(), null, null);
+        // Create a ServerSocketFactory from the SSLContext
+        ServerSocketFactory ssf = sslc.getServerSocketFactory();
+        // Socket to me
+        SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(httpProperties.getServerPort());
+        // Authenticate the client?
+        logger.info("Client Authentication is " + httpProperties.getSslClientAuth());
+        serverSocket.setNeedClientAuth(httpProperties.getSslClientAuth());
+        // Return a ServerSocket on the desired port
+        return serverSocket;
     }
     
   public void RunIsolator() {
@@ -152,7 +187,7 @@ public class httpStub {
         /*
          * open the socket
          */
-        serverSocket = getServerSocket();
+        serverSocket = getSslServerSocket();
         serverSocket.setSoTimeout(5 * 1000);
         
       } catch (Exception e) {

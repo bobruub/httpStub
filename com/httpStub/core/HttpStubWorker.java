@@ -68,7 +68,7 @@ public class HttpStubWorker implements Runnable {
     @Override
     public void run() {
       
-      HttpInputStream inStream = null;
+      HttpInputStream inStream;
       String httpLine = null;
       String postHttpLine = null;
       String searchType = null;
@@ -99,12 +99,15 @@ public class HttpStubWorker implements Runnable {
         int postLength = 0;
         inStream = new HttpInputStream(clientSocket.getInputStream());
         while ((httpLine = inStream.readLine()).length() > 0){
+          logger.debug(httpLine);
            inputMsgLines.addElement(httpLine);
         }
         /*
          * if a POST or PUT message you'll need to read the remainder of the message
          */
+        
         String firstLine = (String)inputMsgLines.elementAt(0); 
+        logger.debug("first line " + firstLine);
         String thisLine = null;
         String postLine = null;
         if (firstLine.substring(0,4).equalsIgnoreCase("POST") || 
@@ -208,7 +211,9 @@ public class HttpStubWorker implements Runnable {
          */
         RandomNumberGenerator generator = new RandomNumberGenerator(waitDistribution, waitFrom, waitTo);
         long timeToSleep = Double.valueOf(generator.uniformRandom(waitFrom, waitTo)).longValue();
-        String sleepTime = String.format("%.2f", generator.uniformRandom(waitFrom, waitTo));
+        //double timeToSleep = Double.valueOf(generator.uniformRandom(waitFrom, waitTo));
+        //long longTimeToSleep = Long.valueOf(timeToSleep.toString());
+        String sleepTime = String.format("%04.2d", timeToSleep);
         Thread.currentThread().sleep(timeToSleep * 1000);
  
         /*
