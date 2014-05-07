@@ -9,13 +9,10 @@ Date: 25/03/2014
 
 **/
 
-// import java.util.List;
-
 public class EventMessage {
   
   private BaseLineMessage template;
   private boolean DecodeEscape = false;
-//  private String outputOverride;
   private float  waitFrom;
   private float  waitTo;
   private String  waitDistribution;
@@ -71,7 +68,7 @@ public class EventMessage {
     this.waitTo = Float.parseFloat(waitTo);
   }
   
-  public boolean DecodeEscape() {
+  public boolean getDecodeEscape() {
     return DecodeEscape;
   }
     

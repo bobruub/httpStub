@@ -7,20 +7,16 @@ Notes:
 Author: Tim Lane
 Date: 24/03/2014
 **/
-// import java.io.*;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import java.io.File;
 import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
-//import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 
 public class CoreProperties {
 
@@ -32,27 +28,42 @@ public class CoreProperties {
     public static final String EVENT_SENDER_TAG = "SenderEvent";
     public static final String BASELINE_MESSAGE_TAG = "BaselineMessage";
     public static final String EVENT_MESSAGE_TAG = "EventMessage";
+    public static final String DATABASE_TAG = "DataBase";
+    public static final String DATABASE_EVENT_TAG = "DatabaseEvent";
+    public static final String DATABASE_DETAILS_TAG = "DatabaseEventDetail";
     
-    private boolean         quite = false;
-    private boolean         singleSearch = false;
+        
     private String logFileName;
     private String logLevel;
     private String author;
     private String name;
     private String description;
     private String date;
+    private int numberValue;
+    /*
+     * database element variables
+     */
+    private String DBServerIp;
+    private String DBServerPort;
+    private String DBName;
+    private String DBUserName;
+    private String DBUserPassword;
     
     private List<Variable>  variables = new ArrayList<Variable>();
     private List<BaseLineMessage>  baselineMessages = new ArrayList<BaseLineMessage>();
     private List<ReceiverEvent> receiverEvents = new ArrayList<ReceiverEvent>();
+    private List<DatabaseEvent> databaseEvents = new ArrayList<DatabaseEvent>();
+    
     
     public CoreProperties(){
     }
     
-    public CoreProperties(String configFileName){
+    public CoreProperties(String configFileName, Logger logger){
       
       try {
-        XMLExtractor extractor = new XMLExtractor(new FileInputStream(new File(configFileName)));
+        FileInputStream inFile = new FileInputStream(new File(configFileName));
+                                                     
+        XMLExtractor extractor = new XMLExtractor(inFile);
         /*
          * get core details
          * <Core Author="Tim Lane" Name="ESG KISS V0.5" Description="ESG KISS Stub Port 9001" Date="07/02/2014">
@@ -63,13 +74,18 @@ public class CoreProperties {
          setDescription(coreElement.getAttribute("Description"));
          setDate(coreElement.getAttribute("Date"));
         
-        /* 
-         * get header details
-         * <Header DefaultReceiver="SINK" Quiet="FALSE" SingleSearch="TRUE"/>
+        /*
+         * get database details
+         *  <DataBase DBServerIp="10.1.1.1" DBServerPort="80" DBName="DB_name" 
+         *             DBUserName="root" DBUserPassword="password" />
          */
-        Element headerElement = extractor.getElement(HEADER_TAG);
-        setQuite(headerElement.getAttribute("Quite"));
-        setSingleSearch(headerElement.getAttribute("SingleSearch"));
+        Element databaseElement = extractor.getElement(DATABASE_TAG);
+        setDBServerIp(databaseElement.getAttribute("DBServerIp"));
+        setDBServerPort(databaseElement.getAttribute("DBServerPort"));
+        setDBName(databaseElement.getAttribute("DBName"));
+        setDBUserName(databaseElement.getAttribute("DBUserName"));
+        setDBUserPassword(databaseElement.getAttribute("DBUserPassword"));
+        
         /* 
          * get variables
          * <Variable Name="TIMESTAMP" Type="Timestamp" Format="HH:mm:ss"/>
@@ -78,7 +94,7 @@ public class CoreProperties {
         for (int s = 0; s < variableNodes.getLength(); s++)
         {
             Element variableElement = (Element)variableNodes.item(s);
-            addVariable(getVariable(variableElement));
+            addVariable(getVariable(variableElement,logger));
         }
         
         /* 
@@ -101,11 +117,23 @@ public class CoreProperties {
             addReceiverEvent(getReceiverEvent(receiverElement, getBaselineMessages()));
         }
         
-      
+        /*
+         * get database envent nodes
+         *  <DatabaseEvent Name="WRITECODE" PHPFile="insert.php"  />
+         */
+        NodeList databaseNodes = extractor.getNodeList(DATABASE_EVENT_TAG);
+        for (int s = 0; s < databaseNodes.getLength(); s++) {
+            Element databasesElement = (Element)databaseNodes.item(s);
+            addDatabaseEvent(getDatabaseEvent(databasesElement));
+            
+        }
+        
+        inFile.close();
       } catch (Exception e) {
-        System.out.println("CoreProperties: error processing xml config file. " + configFileName);
+        logger.error("CoreProperties: error processing xml config file. " + configFileName 
+                    + " " + e);
         e.printStackTrace();
-      }
+      } 
     }
     /*
      * core elements
@@ -143,31 +171,57 @@ public class CoreProperties {
       return this.date;
     }
     
+    /*
+     * set/get database details
+     */
     
+    public void setDBServerIp(String DBServerIp){
+      this.DBServerIp = DBServerIp;
+    }
+    public void setDBServerPort(String DBServerPort){
+      this.DBServerPort = DBServerPort;
+    }
+    public void setDBName(String DBName){
+      this.DBName = DBName;
+    }
+    public void setDBUserName(String DBUserName){
+      this.DBUserName = DBUserName;
+    }
+    public void setDBUserPassword(String DBUserPassword){
+      this.DBUserPassword = DBUserPassword;
+    }
     
-    // Header element QUITE
-    public void setQuite(String quiet) {
-      if (quiet.toUpperCase().matches("TRUE")){
-        this.quite = true;
-      } else {
-         this.quite = false;
-      }
+    public String getDBServerIp(){
+      return this.DBServerIp;
+    }
+    public String getDBServerPort(){
+      return this.DBServerPort;
+    }
+    public String getDBName(){
+      return this.DBName;
+    }
+    public String getDBUserName(){
+      return this.DBUserName;
+    }
+    public String getDBUserPassword(){
+      return this.DBUserPassword;
     }
         
-    public boolean isQuite(){
-      return this.quite;
-    }  
-   // header element SingleSearch
-    public void setSingleSearch(String singleSearch) {
-      if (singleSearch.toUpperCase().matches("TRUE")){
-        this.singleSearch = true;
-      } else {
-        this.singleSearch = false;
-      }
+    public void setNumberValue(String numberValue) {
+      this.numberValue=Integer.valueOf(numberValue);
     }
-        
-    public boolean isSingleSearch(){
-      return this.singleSearch;
+    
+    public int getNumberValue() {
+      return this.numberValue;
+    }
+    
+    public void updateNumberValue(String numberIncrement) {
+      if (numberIncrement.length() == 0){
+        int increment = Integer.parseInt(numberIncrement);
+        this.numberValue += increment;
+      } else {
+          this.numberValue++;
+      }
     }
     
     public void setLogFileName(String logFileName) {
@@ -196,7 +250,7 @@ public class CoreProperties {
         return variables;
     }
     
-    private static Variable getVariable(Element variableElement){
+    private static Variable getVariable(Element variableElement, Logger logger){
         try {
             Variable variable = new Variable();
             variable.setName(variableElement.getAttribute("Name"));
@@ -213,13 +267,16 @@ public class CoreProperties {
             variable.setRightOf(variableElement.getAttribute("RightOf"));
             variable.setOffset(variableElement.getAttribute("Offset"));
             variable.setOccurrence(variableElement.getAttribute("Occurrence"));
-            // needs to be implemented.
-            // variable.setFileName(variableElement.getAttribute("Filename"));
+            variable.setFileName(variableElement.getAttribute("Filename"));
+            variable.setNumberValue(variableElement.getAttribute("Filename"), 
+                                    variableElement.getAttribute("InitialValue"));
             variable.setRandMin(variableElement.getAttribute("RandMin"));
             variable.setRandMax(variableElement.getAttribute("RandMax"));
             variable.setDefaultValue(variableElement.getAttribute("DefaultValue"));
             variable.setConvert(variableElement.getAttribute("Convert"));
             variable.setTrim(variableElement.getAttribute("Trim"));
+            variable.setDatabaseEvent(variableElement.getAttribute("DatabaseEvent"));  
+            
             /* lets get core working before adding external lookups and saves.
             variable.setXAMPP(variableElement.getAttribute("XAMPP"));
             variable.setSQLKeyValue(variableElement.getAttribute("SQLKeyValue"));
@@ -231,8 +288,8 @@ public class CoreProperties {
             */
             return variable;
         } catch (Exception e) {
-            System.out.println("CoreProperties: Error setting variables.");
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("CoreProperties: Error setting variables." + e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -263,7 +320,6 @@ public class CoreProperties {
     
     /*
      * get the receiver event elements
-     * 
     */
     public void addReceiverEvent(ReceiverEvent receiverEvent) {
         receiverEvents.add(receiverEvent);
@@ -294,19 +350,39 @@ public class CoreProperties {
     
     private static EventMessage getMessage(Element messageElement, List baselineMsgs){
         EventMessage message = new EventMessage();
-        
-        //System.out.println("CoreProperties: message template " + messageElement.getAttribute("BaselineMessage"));
-          
         message.setTemplate(BaseLineMessage.findInList(baselineMsgs, messageElement.getAttribute("BaselineMessage")));
         message.setName(messageElement.getAttribute("BaselineMessage"));
         message.setWaitDistribution(messageElement.getAttribute("WaitDistribution"));
         message.setWaitFrom(messageElement.getAttribute("MinWait"));
         message.setWaitTo(messageElement.getAttribute("MaxWait"));
         message.setDecodeEscape(messageElement.getAttribute("DecodeEscape"));
-        // external lookups and writes to be added later
-        // message.setWriteToXAMPP(messageElement.getAttribute("WriteToXAMPP"));
-
         return message;
+    }
+        
+    public void addDatabaseEvent(DatabaseEvent databaseEvent) {
+        databaseEvents.add(databaseEvent);
+    }
+    
+    public List getDatabaseEvents(){
+        return databaseEvents;
+    }
+    
+    private static DatabaseEvent getDatabaseEvent(Element databaseElement){
+        DatabaseEvent databaseEvent = new DatabaseEvent();
+        databaseEvent.setDBTable(databaseElement.getAttribute("DBTable"));
+        databaseEvent.setName(databaseElement.getAttribute("Name"));
+        databaseEvent.setPHPFile(databaseElement.getAttribute("PHPFile"));
+        databaseEvent.setDBServerIP(databaseElement.getAttribute("DBServerIP"));
+        return databaseEvent;
+    }
+    
+    
+    private static DatabaseEventDetail getDatabaseDetails(Element databaseDetailsElement){
+        DatabaseEventDetail databaseEventDetail = new DatabaseEventDetail();
+        databaseEventDetail.setName(databaseDetailsElement.getAttribute("Name"));
+        databaseEventDetail.setDBEventName(databaseDetailsElement.getAttribute("DatabaseEvent"));
+        databaseEventDetail.setDBField(databaseDetailsElement.getAttribute("DBField"));
+        return databaseEventDetail;
     }
         
 }

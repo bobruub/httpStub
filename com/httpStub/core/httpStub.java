@@ -32,8 +32,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 
 public class httpStub {
   
@@ -41,7 +44,7 @@ public class httpStub {
   private ServerSocket serverSocket;
   private HttpBaseLineMessage httpBaseLineMessage;
   private LogFileProperties logFileProperties;
-  private static String httpVersion = "1.0a";
+  private static String httpVersion = "1.5";
   
   // Create an HTTPStub for a particular TCP port
   public httpStub(HttpProperties httpProperties, LogFileProperties logFileProperties)
@@ -58,14 +61,14 @@ public class httpStub {
      */
     String configFileName = null;
     
-    System.out.println("version " + httpVersion);
+    System.out.println("httpStub: version " + httpVersion);
     
     if (args.length > 0) {
       configFileName = args[0];
-      System.out.println("using config file: " + configFileName);
+      System.out.println("httpsStub: using config file: " + configFileName);
     } else {
-      configFileName = "d:\\dropbox\\java\\httpstub\\vie_test.xml";
-      System.out.println("using default config file: " + configFileName);
+      configFileName = "C:\\TEMP\\vie\\xml\\vie_test.xml";
+      System.out.println("httpsStub: using default config file: " + configFileName);
     } 
     
     try {
@@ -80,11 +83,28 @@ public class httpStub {
      * setup logging
      * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
      */
+/*
+     * setup logging
+     * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+     */
       LogFileProperties logFileProperties = new LogFileProperties(extractor.getElement("Header")) ;
-      System.out.println("log config file : " + logFileProperties.getLogFileName()); 
+      System.out.println("httpsStub: log4j config file : " + logFileProperties.getLogFileName()); 
       PropertyConfigurator.configure(logFileProperties.getLogFileName());
-      System.out.println("Log4j appender configuration is successful");
-      logger.info("non SSL version " + httpVersion);
+      if (logFileProperties.getLogLevel().toUpperCase().equals("INFO")) {
+        logger.setLevel(Level.INFO);
+      } else if (logFileProperties.getLogLevel().toUpperCase().equals("DEBUG")) {
+        logger.setLevel(Level.DEBUG);
+      } else if (logFileProperties.getLogLevel().toUpperCase().equals("WARN")) {
+        logger.setLevel(Level.WARN);
+      } else if (logFileProperties.getLogLevel().toUpperCase().equals("ERROR")) {
+        logger.setLevel(Level.ERROR);
+      } else if (logFileProperties.getLogLevel().toUpperCase().equals("FATAL")) {
+        logger.setLevel(Level.FATAL);
+      } else if (logFileProperties.getLogLevel().toUpperCase().equals("TRACE")) {
+        logger.setLevel(Level.TRACE);
+      }
+      System.out.println("httpsStub: logging level set to : " + logger.getLevel().toString());
+      logger.info("Non SSL version " + httpVersion);
       
       httpStub httpStub = new httpStub(httpProperties, logFileProperties);
       httpStub.RunIsolator();
@@ -106,7 +126,7 @@ public class httpStub {
     
   public void RunIsolator() {
     
-    CoreProperties coreProperties = new CoreProperties(httpProperties.getConfigFileName());
+    CoreProperties coreProperties = new CoreProperties(httpProperties.getConfigFileName(),logger);
     /*
      * display stub information to log file
      */
@@ -164,12 +184,13 @@ public class httpStub {
       /*
        * listen for connections...
        */
+      Socket clientConnection = null;
       while (connectionLoop){
         try {
           /*
            * accept connections a connection on a new socket
            */
-          Socket clientConnection = null;
+          
           clientConnection = serverSocket.accept();
           clientConnection.setSoTimeout(5 * 1000);
           /*
@@ -181,6 +202,10 @@ public class httpStub {
                                                          coreProperties,
                                                          logger);
             executor.execute(httpStubWorker);
+            /*
+             * 1.5
+             */
+            clientConnection.close();
             
           }
                     

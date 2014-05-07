@@ -22,7 +22,6 @@ public class LogFileProperties {
   public static final String HEADER_TAG = "Header";
   
   public LogFileProperties(Element logFilePropertiesElement) {
-    
     setLogFileName(logFilePropertiesElement.getAttribute("LogFileName"));
     setLogLevel(logFilePropertiesElement.getAttribute("LogLevel"));
   }

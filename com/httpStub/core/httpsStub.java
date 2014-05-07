@@ -1,8 +1,8 @@
 package com.httpStub.core;
 
 /**
-class: HttpStub
-Purpose: main method for HTTP stubbing
+class: HttpsStub
+Purpose: main method for HTTPS stubbing
 Notes: http only
 Author: Tim Lane
 Date: 24/03/2014
@@ -32,8 +32,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.FileAppender;
+
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -51,7 +56,18 @@ public class httpsStub {
   private ServerSocket serverSocket;
   private HttpBaseLineMessage httpBaseLineMessage;
   private LogFileProperties logFileProperties;
-  private static String httpVersion = "1.0a";
+  private static String httpVersion = "1.5";
+  
+  /*
+   * 1.2  09/04/2014 lanet - added some performance improvemnts
+   * 1.2a 10/04/2014 lanet - changed threading model
+   * 1.3  16/04/2014 lanet - revert thrread model
+   *                       - add content length type
+   * 1.4  29/04/2014 lanet - changed http handling to have header in xml
+   * 1.5  29/04/2014 lanet - closed httpinputfilestream after reading all data
+   * 1.6  31/04/2014 lanet - added Number and String type variables
+   * 1.8  07/05/2014 lanet - added wite to xamp database server.
+   */
   
   // Create an HTTPS Stub for a particular TCP port
   public httpsStub(HttpProperties httpProperties, LogFileProperties logFileProperties)
@@ -67,15 +83,16 @@ public class httpsStub {
      * get config file, need command line option
      */
     String configFileName = null;
-    
-    System.out.println("version " + httpVersion);
-    
+    String configMessage = null;
+    /*
+     * get xml file from the command line
+     */
     if (args.length > 0) {
       configFileName = args[0];
-      System.out.println("using config file: " + configFileName);
-    } else {
-      configFileName = "E:\\Users\\Tim\\Documents\\GitHub\\httpStub\\vie_test.xml";
-      System.out.println("using default config file: " + configFileName);
+      configMessage = "XML config file: " + configFileName;
+    } else { // default for testing purposes.
+      configFileName = "C:\\TEMP\\vie\\xml\\vie_test.xml";
+      configMessage = "XML config file: : " + configFileName;
     } 
     
     try {
@@ -91,17 +108,17 @@ public class httpsStub {
      * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
      */
       LogFileProperties logFileProperties = new LogFileProperties(extractor.getElement("Header")) ;
-      System.out.println("log config file : " + logFileProperties.getLogFileName()); 
       PropertyConfigurator.configure(logFileProperties.getLogFileName());
-      System.out.println("Log4j appender configuration is successful");
-      logger.info("SSL version " + httpVersion);
-      
+      logger.setLevel(Level.INFO); // for INFO for header information
+      logger.info("httpsStub: version " + httpVersion);
+      logger.info(configMessage);
+      logger.info("log4j config file : " + logFileProperties.getLogFileName());
       httpsStub httpsStub = new httpsStub(httpProperties, logFileProperties);
       httpsStub.RunIsolator();
     } catch (Exception e) {
-      logger.error("error extracting XML file " + configFileName);
-      //e.printStackTrace();
-       System.exit(1);
+      logger.error("httpsStub: error extracting XML file " + configFileName + ". " + e);
+      e.printStackTrace();
+      System.exit(1);
     }
    
   }
@@ -115,13 +132,14 @@ ServerSocket getSslServerSocket() throws Exception
         // Both the keystore and individual private keys should be password protected
         KeyStore keystore = KeyStore.getInstance("JKS");
         
-        logger.info("Opening SSL Key Store " + httpProperties.getSslKeyStore() + " with password: " + httpProperties.getSslKeyPswd());
+        logger.info(" Opening SSL Key Store " + httpProperties.getSslKeyStore() 
+                      + " with password: " + httpProperties.getSslKeyPswd());
         keystore.load(new FileInputStream(httpProperties.getSslKeyStore()), httpProperties.getSslKeyPswd().toCharArray());
        
         // A KeyManagerFactory is used to create key managers
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
         // Initialize the KeyManagerFactory to work with our keystore
-        logger.info("Accessing KeyManageFactory with password " + httpProperties.getSslKeyPswd());
+        logger.info(" Accessing KeyManageFactory with password " + httpProperties.getSslKeyPswd());
         kmf.init(keystore, httpProperties.getSslKeyPswd().toCharArray());
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
@@ -133,7 +151,7 @@ ServerSocket getSslServerSocket() throws Exception
         // Socket to me
         SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(httpProperties.getServerPort());
         // Authenticate the client?
-        logger.info("Client Authentication is " + httpProperties.getSslClientAuth());
+        logger.info(" Client Authentication is " + httpProperties.getSslClientAuth());
         serverSocket.setNeedClientAuth(httpProperties.getSslClientAuth());
         // Return a ServerSocket on the desired port
         return serverSocket;
@@ -141,14 +159,29 @@ ServerSocket getSslServerSocket() throws Exception
     
   public void RunIsolator() {
     
-    CoreProperties coreProperties = new CoreProperties(httpProperties.getConfigFileName());
+    CoreProperties coreProperties = new CoreProperties(httpProperties.getConfigFileName(),
+                                                       logger);
     /*
      * display stub information to log file
      */
     logger.info("Author : " + coreProperties.getAuthor()
-                  + " Name : " + coreProperties.getName()
-                  + " Description : " + coreProperties.getDescription()
-                  + " Date : " + coreProperties.getDate());
+                  + " - Name : " + coreProperties.getName()
+                  + " - Description : " + coreProperties.getDescription()
+                  + " - Date : " + coreProperties.getDate());
+
+    /*
+     * if database details are set then displayt the details
+     */
+    if(coreProperties.getDBServerIp()!= null && coreProperties.getDBServerIp().length() != 0 ) {
+           
+      logger.info("Database Details...");
+      logger.info(" Server IP : " + coreProperties.getDBServerIp()
+                    + " - Server Port : " + coreProperties.getDBServerPort());
+      logger.info(" Database Name : " + coreProperties.getDBName()
+                    + " - Database User : " + coreProperties.getDBUserName()
+                    + " - Database Password : " + coreProperties.getDBUserPassword());
+    }
+    
     /*
      * load the variable configurations
      */
@@ -189,9 +222,28 @@ ServerSocket getSslServerSocket() throws Exception
          */
         serverSocket = getSslServerSocket();
         serverSocket.setSoTimeout(5 * 1000);
+            /*
+             * now weve written header detail, set log level to that in the xml
+             */
+        logger.info("logging set to : " + logFileProperties.getLogLevel().toUpperCase()); 
+        if (logFileProperties.getLogLevel().toUpperCase().equals("INFO")) {
+          logger.setLevel(Level.INFO);
+        } else if (logFileProperties.getLogLevel().toUpperCase().equals("DEBUG")) {
+          logger.setLevel(Level.DEBUG);
+        } else if (logFileProperties.getLogLevel().toUpperCase().equals("WARN")) {
+          logger.setLevel(Level.WARN);
+        } else if (logFileProperties.getLogLevel().toUpperCase().equals("ERROR")) {
+          logger.setLevel(Level.ERROR);
+        } else if (logFileProperties.getLogLevel().toUpperCase().equals("FATAL")) {
+          logger.setLevel(Level.FATAL);
+        } else if (logFileProperties.getLogLevel().toUpperCase().equals("TRACE")) {
+          logger.setLevel(Level.TRACE);
+        }
         
       } catch (Exception e) {
-        logger.error("Unable to listen on " + httpProperties.getServerIP() + ":" + httpProperties.getServerPort());
+        logger.error("httpsStub: Unable to listen on " + httpProperties.getServerIP() + ":" 
+                       + httpProperties.getServerPort()
+                       + ". " + e);
         e.printStackTrace();
         // exit on fail to bind port id.
         System.exit(1);
@@ -211,25 +263,35 @@ ServerSocket getSslServerSocket() throws Exception
            * Handle the connection with a separate thread                     
            */
           if (clientConnection != null) {
+            
+            if (logger.isInfoEnabled()) {
+              logger.debug("httpsStub: accepted connection from : " + clientConnection.getRemoteSocketAddress());
+            }
             Runnable httpStubWorker = new HttpStubWorker(clientConnection, 
                                                          httpProperties,
                                                          coreProperties,
                                                          logger);
+            //Thread thread = new Thread(httpStubWorker);
+            //thread.start();
+            
             executor.execute(httpStubWorker);
+
             
           }
+     
                     
         } catch (SocketTimeoutException e) {
           // System.out.println("socket timeout " + connectionLoopCntr + ".");
           // DO NOTHING - The timeout just allows the checking of the restart
           // request and will only close the socket server if a restart request
           // has been issued
+          /*
+           * 1.5
+           */
         } catch (Exception e) {
-          logger.error("socket exception.");
+          logger.error("httpsStub: socket exception. " + e );
           e.printStackTrace();
-        } finally {
-          
-        }
+        } 
             
       }
       /* 

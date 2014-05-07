@@ -35,6 +35,23 @@ public class RandomNumberGenerator {
         _randMax = randMax;
     }
     
+    public double randomDouble(){
+        return randomDouble(_distribution, _randMin, _randMax);
+    }
+    
+    public double randomDouble(String waitDistribution, double randMin, double randMax)
+    {
+        double generatorTime;
+                
+        if (waitDistribution.equals("UNIFORM")){
+            generatorTime = uniformRandom(randMin, randMax);
+        } else {
+            generatorTime = 0.0;
+        }
+        return generatorTime;
+    }
+    
+        
     public double uniformRandom(double randMin, double randMax){
      return _generator.nextDouble() * (randMax - randMin) + randMin;
     }

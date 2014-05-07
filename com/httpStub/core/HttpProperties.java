@@ -9,7 +9,6 @@ Date: 24/03/2014
 
 **/
 
-import java.io.*;
 import org.w3c.dom.Element;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -26,6 +25,7 @@ public class HttpProperties {
   private String sslKeyStorePswd;
   private String sslCertStore;
   private boolean sslClientAuth;
+  private int activeThreadCount = 0;
   
   public static final String HOST_TAG = "Host";
   public static final String PORT_TAG = "Port";
@@ -50,6 +50,15 @@ public class HttpProperties {
     setSslCertStore(httpReceiverElement.getAttribute(SSL_CERT_STORE_TAG));
     setSslClientAuth(httpReceiverElement.getAttribute(SSL_CLIENT_AUTH_TAG));
     
+  }
+  
+  
+  public void setActiveThreadCount(){
+    this.activeThreadCount++ ;
+  }
+  
+  public int getActiveThreadCount(){
+    return activeThreadCount;
   }
   
   public void setThreadCount(String threadCount){

@@ -18,7 +18,9 @@ public class HttpInputStream extends FilterInputStream{
         super(in);
     }
       
-    // get a whole line by passing the number of characters on a lin
+    /*
+     * get a whole line by passing the number of characters on a line
+     */
     public String readLine(int lineLength) throws Exception {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < lineLength; i++)
@@ -29,7 +31,9 @@ public class HttpInputStream extends FilterInputStream{
         return result.toString();
     }
 
-    // Get a line by reading all characters
+    /*
+     * Get a line by reading all characters
+     */
     public String readLine() throws Exception
     {
         StringBuffer result=new StringBuffer();
