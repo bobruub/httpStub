@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import java.text.SimpleDateFormat;
 
 
 public class Variable {
@@ -74,6 +77,16 @@ public class Variable {
   private String Delimiter;
   private String numberValue;
   private String databaseEvent;
+
+  SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
+  String formattedDate;
+  Date date;
+      
+  private Logger logger;
+  
+  public Variable(Logger logger){
+    this.logger = logger;
+  }
   
   public String getName() {
     return Name;
@@ -99,7 +112,7 @@ public class Variable {
       //System.out.println("variable: no filename set. Number variables require a FileName");
     } else {
       /*
-       * if the initial value is set then update the file with this value
+       * if the initial value is already set then update the file with this value
        */
       if (initialValue.length() > 0 ) {
         this.numberValue = initialValue;
@@ -108,7 +121,9 @@ public class Variable {
           out.write(initialValue);
           out.close();
         } catch (FileNotFoundException e) { 
-          System.out.println("variable: data error setting number value: " + e);
+          date = new Date();
+          formattedDate = sdf.format(date);
+          logger.error("variable: " + formattedDate + " data error setting number value: " + e);
         }
       } else {
         /*
@@ -119,7 +134,9 @@ public class Variable {
           this.numberValue = in.readLine();
           in.close();
         } catch (FileNotFoundException e) { 
-          System.out.println("variable: data error getting number value: " + e);
+          date = new Date();
+          formattedDate = sdf.format(date);
+          logger.error("variable: " + formattedDate + " data error getting number value: " + e);
         }
         
       }
@@ -131,9 +148,7 @@ public class Variable {
   }
   
   public void updateNumberValue(String fileName,String numberValue, String increment)
-    
   {
-    
     double tmpIncrement = Integer.parseInt(increment);
     double tmpNumberValue = Double.parseDouble(numberValue);
     tmpNumberValue = tmpNumberValue + tmpIncrement ;
@@ -144,11 +159,12 @@ public class Variable {
       out.write(this.numberValue);
       out.close();
     } catch (Exception e) { 
-      System.out.println("variable: data error updating number variable: " + fileName);
+      date = new Date();
+      formattedDate = sdf.format(date);
+      logger.error("variable: " + formattedDate + " data error updating number variable: " + fileName);
     }
     
   }
-  
   
   public String getValue() {
     return Value;

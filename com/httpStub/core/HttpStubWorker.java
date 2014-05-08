@@ -355,8 +355,8 @@ public class HttpStubWorker implements Runnable {
            for (int i = 0; i < coreProperties.getDatabaseEvents().size(); i++) {
              databaseEvent = (DatabaseEvent) coreProperties.getDatabaseEvents().get(i);
              if (databaseEvent.getName().equals(parts[0])){
-               databaseString = "http://" + coreProperties.getDBServerIp() 
-                                 + ":" + coreProperties.getDBServerPort()
+               databaseString = "http://" + databaseEvent.getDBServerIP() 
+                                 + ":" + databaseEvent.getDBServerPort()
                                  + "/" + databaseEvent.getPHPFile() 
                                  + "?" + parts[1];
                if (logger.isInfoEnabled()) {
@@ -429,14 +429,12 @@ public class HttpStubWorker implements Runnable {
       } else if (variable.getType().equals(STRING_TYPE)){
         variableValue = processStringType(variable);
       }
-      
       return variableValue;
     }
            
     public String processDelimitedType(String httpLine, Variable variable){
       
       String variableValue = null;
-      
       try {
         String[] rightOf = httpLine.split(variable.getRightOf());
         String[] leftOf = rightOf[1].split(variable.getLeftOf());

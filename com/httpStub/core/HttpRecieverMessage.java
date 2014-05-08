@@ -15,10 +15,5 @@ Date: 24/03/2014
 public class HttpRecieverMessage {
   
   private String httpRecieverMessage;
-  
-  
-  
-  
-  
-  
+      
 }

@@ -35,8 +35,7 @@ public class HttpProperties {
   public static final String SSL_KEY_STORE_PASSWORD_TAG = "SSLKeyStorePswd";
   public static final String SSL_CERT_STORE_TAG = "SSLCertStore";
   public static final String SSL_CLIENT_AUTH_TAG = "SSLClientAuth";
-       
-  
+
   boolean testFlag = false;
   
   public HttpProperties(Element httpReceiverElement) {
@@ -149,12 +148,9 @@ public class HttpProperties {
   public void setServerBacklog(String ServerBacklog){
     this.ServerBacklog = Integer.parseInt(ServerBacklog);
   }
-
-
   
   public int getServerPort(){
     return ServerPort;
-    
   }
   
   public int getServerBacklog(){
@@ -167,13 +163,9 @@ public class HttpProperties {
     } else {
       return this.testFlag = false;
     }
-  
   }
 
   public boolean getTestFlag(){
     return testFlag;
   }
- 
-
-
 }

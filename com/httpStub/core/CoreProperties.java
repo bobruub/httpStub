@@ -78,14 +78,18 @@ public class CoreProperties {
          * get database details
          *  <DataBase DBServerIp="10.1.1.1" DBServerPort="80" DBName="DB_name" 
          *             DBUserName="root" DBUserPassword="password" />
-         */
+        
+        Note: deprecated, all database access is now via DatabaseEvents and uses
+                          a xampp server.
+        
         Element databaseElement = extractor.getElement(DATABASE_TAG);
         setDBServerIp(databaseElement.getAttribute("DBServerIp"));
         setDBServerPort(databaseElement.getAttribute("DBServerPort"));
         setDBName(databaseElement.getAttribute("DBName"));
         setDBUserName(databaseElement.getAttribute("DBUserName"));
         setDBUserPassword(databaseElement.getAttribute("DBUserPassword"));
-        
+         */
+         
         /* 
          * get variables
          * <Variable Name="TIMESTAMP" Type="Timestamp" Format="HH:mm:ss"/>
@@ -119,7 +123,7 @@ public class CoreProperties {
         
         /*
          * get database envent nodes
-         *  <DatabaseEvent Name="WRITECODE" PHPFile="insert.php"  />
+         *  <DatabaseEvent Name="WRITECODE"  PHPFile="insert.php"  />
          */
         NodeList databaseNodes = extractor.getNodeList(DATABASE_EVENT_TAG);
         for (int s = 0; s < databaseNodes.getLength(); s++) {
@@ -171,10 +175,7 @@ public class CoreProperties {
       return this.date;
     }
     
-    /*
-     * set/get database details
-     */
-    
+   
     public void setDBServerIp(String DBServerIp){
       this.DBServerIp = DBServerIp;
     }
@@ -252,7 +253,7 @@ public class CoreProperties {
     
     private static Variable getVariable(Element variableElement, Logger logger){
         try {
-            Variable variable = new Variable();
+            Variable variable = new Variable(logger);
             variable.setName(variableElement.getAttribute("Name"));
             variable.setType(variableElement.getAttribute("Type"));
             variable.setValue(variableElement.getAttribute("Value"));
@@ -276,16 +277,6 @@ public class CoreProperties {
             variable.setConvert(variableElement.getAttribute("Convert"));
             variable.setTrim(variableElement.getAttribute("Trim"));
             variable.setDatabaseEvent(variableElement.getAttribute("DatabaseEvent"));  
-            
-            /* lets get core working before adding external lookups and saves.
-            variable.setXAMPP(variableElement.getAttribute("XAMPP"));
-            variable.setSQLKeyValue(variableElement.getAttribute("SQLKeyValue"));
-            variable.setSQLKeyData(variableElement.getAttribute("SQLKeyData"));
-            variable.setMysqlKey(variableElement.getAttribute("MysqlKey"));
-            variable.setMysqlData(variableElement.getAttribute("MysqlData"));
-            variable.setMysqlTable(variableElement.getAttribute("MysqlTable"));
-            variable.setRegexString(variableElement.getAttribute("RegexString"));
-            */
             return variable;
         } catch (Exception e) {
             logger.error("CoreProperties: Error setting variables." + e);
@@ -369,10 +360,10 @@ public class CoreProperties {
     
     private static DatabaseEvent getDatabaseEvent(Element databaseElement){
         DatabaseEvent databaseEvent = new DatabaseEvent();
-        databaseEvent.setDBTable(databaseElement.getAttribute("DBTable"));
         databaseEvent.setName(databaseElement.getAttribute("Name"));
-        databaseEvent.setPHPFile(databaseElement.getAttribute("PHPFile"));
         databaseEvent.setDBServerIP(databaseElement.getAttribute("DBServerIP"));
+        databaseEvent.setDBServerPort(databaseElement.getAttribute("DBServerPort"));
+        databaseEvent.setPHPFile(databaseElement.getAttribute("PHPFile"));
         return databaseEvent;
     }
     

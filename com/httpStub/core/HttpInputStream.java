@@ -14,8 +14,7 @@ import java.io.InputStream;
 public class HttpInputStream extends FilterInputStream{
   
     public HttpInputStream(InputStream in) {
-      
-        super(in);
+      super(in);
     }
       
     /*

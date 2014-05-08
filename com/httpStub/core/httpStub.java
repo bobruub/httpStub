@@ -44,7 +44,7 @@ public class httpStub {
   private ServerSocket serverSocket;
   private HttpBaseLineMessage httpBaseLineMessage;
   private LogFileProperties logFileProperties;
-  private static String httpVersion = "1.5";
+  private static String httpVersion = "1.9";
   
   // Create an HTTPStub for a particular TCP port
   public httpStub(HttpProperties httpProperties, LogFileProperties logFileProperties)

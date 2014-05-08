@@ -20,7 +20,7 @@ public class DatabaseEvent {
   private String dbEventName;
   private String phpFile;
   private String dbServerIP;
-  
+  private String dbServerPort;  
   
   private List<DatabaseEventDetail> databaseEventDetails = new ArrayList<DatabaseEventDetail>();
   
@@ -63,6 +63,14 @@ public class DatabaseEvent {
   
    public String getDBServerIP(){
     return this.dbServerIP;
+  }
+   
+      public void setDBServerPort(String dbServerPort){
+    this.dbServerPort = dbServerPort;
+  }  
+  
+   public String getDBServerPort(){
+    return this.dbServerPort;
   }
    
   /* ADD YOUR CODE HERE */

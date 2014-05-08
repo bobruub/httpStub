@@ -3,7 +3,7 @@ package com.httpStub.core;
 /**
 class: HttpsStub
 Purpose: main method for HTTPS stubbing
-Notes: http only
+Notes: httpS only
 Author: Tim Lane
 Date: 24/03/2014
 Version: 
@@ -66,7 +66,8 @@ public class httpsStub {
    * 1.4  29/04/2014 lanet - changed http handling to have header in xml
    * 1.5  29/04/2014 lanet - closed httpinputfilestream after reading all data
    * 1.6  31/04/2014 lanet - added Number and String type variables
-   * 1.8  07/05/2014 lanet - added wite to xamp database server.
+   * 1.8  07/05/2014 lanet - added wRite to xamp database server.
+   * 1.9  08/05/2014 lanet - added logger to all classes
    */
   
   // Create an HTTPS Stub for a particular TCP port
@@ -89,11 +90,10 @@ public class httpsStub {
      */
     if (args.length > 0) {
       configFileName = args[0];
-      configMessage = "XML config file: " + configFileName;
     } else { // default for testing purposes.
       configFileName = "C:\\TEMP\\vie\\xml\\vie_test.xml";
-      configMessage = "XML config file: : " + configFileName;
     } 
+    configMessage = "XML config file: " + configFileName;
     
     try {
       /*
@@ -209,7 +209,23 @@ ServerSocket getSslServerSocket() throws Exception
      */
     logger.info("setting up threadpool of size : " + httpProperties.getThreadCount()); 
     ExecutorService executor = Executors.newFixedThreadPool(httpProperties.getThreadCount());
-
+    /*
+     * now weve written header detail, set log level to that in the xml
+     */
+    logger.info("logging set to : " + logFileProperties.getLogLevel().toUpperCase()); 
+    if (logFileProperties.getLogLevel().toUpperCase().equals("INFO")) {
+      logger.setLevel(Level.INFO);
+    } else if (logFileProperties.getLogLevel().toUpperCase().equals("DEBUG")) {
+      logger.setLevel(Level.DEBUG);
+    } else if (logFileProperties.getLogLevel().toUpperCase().equals("WARN")) {
+      logger.setLevel(Level.WARN);
+    } else if (logFileProperties.getLogLevel().toUpperCase().equals("ERROR")) {
+      logger.setLevel(Level.ERROR);
+    } else if (logFileProperties.getLogLevel().toUpperCase().equals("FATAL")) {
+      logger.setLevel(Level.FATAL);
+    } else if (logFileProperties.getLogLevel().toUpperCase().equals("TRACE")) {
+      logger.setLevel(Level.TRACE);
+    }
     boolean socketLoop = true;
     boolean connectionLoop = true;
     int connectionLoopCntr = 0;
@@ -222,24 +238,7 @@ ServerSocket getSslServerSocket() throws Exception
          */
         serverSocket = getSslServerSocket();
         serverSocket.setSoTimeout(5 * 1000);
-            /*
-             * now weve written header detail, set log level to that in the xml
-             */
-        logger.info("logging set to : " + logFileProperties.getLogLevel().toUpperCase()); 
-        if (logFileProperties.getLogLevel().toUpperCase().equals("INFO")) {
-          logger.setLevel(Level.INFO);
-        } else if (logFileProperties.getLogLevel().toUpperCase().equals("DEBUG")) {
-          logger.setLevel(Level.DEBUG);
-        } else if (logFileProperties.getLogLevel().toUpperCase().equals("WARN")) {
-          logger.setLevel(Level.WARN);
-        } else if (logFileProperties.getLogLevel().toUpperCase().equals("ERROR")) {
-          logger.setLevel(Level.ERROR);
-        } else if (logFileProperties.getLogLevel().toUpperCase().equals("FATAL")) {
-          logger.setLevel(Level.FATAL);
-        } else if (logFileProperties.getLogLevel().toUpperCase().equals("TRACE")) {
-          logger.setLevel(Level.TRACE);
-        }
-        
+          
       } catch (Exception e) {
         logger.error("httpsStub: Unable to listen on " + httpProperties.getServerIP() + ":" 
                        + httpProperties.getServerPort()
@@ -281,13 +280,11 @@ ServerSocket getSslServerSocket() throws Exception
      
                     
         } catch (SocketTimeoutException e) {
-          // System.out.println("socket timeout " + connectionLoopCntr + ".");
-          // DO NOTHING - The timeout just allows the checking of the restart
-          // request and will only close the socket server if a restart request
-          // has been issued
           /*
-           * 1.5
-           */
+          * DO NOTHING - The timeout just allows the checking of the restart
+          * request and will only close the socket server if a restart request
+          * has been issued
+          */           
         } catch (Exception e) {
           logger.error("httpsStub: socket exception. " + e );
           e.printStackTrace();
