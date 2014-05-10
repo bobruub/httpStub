@@ -37,6 +37,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class httpStub {
   
@@ -45,6 +48,8 @@ public class httpStub {
   private HttpBaseLineMessage httpBaseLineMessage;
   private LogFileProperties logFileProperties;
   private static String httpVersion = "1.9";
+  
+  List<String> receiverEventsCntr = new ArrayList<String>();
   
   // Create an HTTPStub for a particular TCP port
   public httpStub(HttpProperties httpProperties, LogFileProperties logFileProperties)
@@ -200,7 +205,8 @@ public class httpStub {
             Runnable httpStubWorker = new HttpStubWorker(clientConnection, 
                                                          httpProperties,
                                                          coreProperties,
-                                                         logger);
+                                                         logger,
+                                                         receiverEventsCntr);
             executor.execute(httpStubWorker);
             /*
              * 1.5

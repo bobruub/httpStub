@@ -56,6 +56,7 @@ public class HttpStubWorker implements Runnable {
     public static final String GUID_TYPE = "Guid";
     public static final String THREAD_COUNT_TYPE = "ThreadCount";
     public static final String CONTENT_LENGTH_TYPE = "ContentLength";
+    public static final String RECEIVEREVENT_COUNT_TYPE = "ReceiverCount";
     
     private RandomNumberGenerator randomGenerator;
     
@@ -63,15 +64,18 @@ public class HttpStubWorker implements Runnable {
     private HttpProperties httpProperties;
     private CoreProperties coreProperties;
     private Logger logger;
+    List<String> receiverEventCntr;
           
     public HttpStubWorker(Socket clientSocket, 
                           HttpProperties httpProperties,
                           CoreProperties coreProperties,
-                          Logger logger){
+                          Logger logger,
+                          List<String> receiverEventCntr){
         this.clientSocket = clientSocket;
         this.httpProperties = httpProperties;
         this.coreProperties = coreProperties;
-        this.logger = logger;
+        this.logger = logger;  
+        this.receiverEventCntr=receiverEventCntr;
     }
 
     @Override
@@ -340,6 +344,38 @@ public class HttpStubWorker implements Runnable {
           logger.error("httpStubWorker: " + formattedDate + " error writing to output stream. : " + e.toString());
           e.printStackTrace();  
         } finally {
+          
+          /* 
+           * update recever event counter
+           */
+          System.out.println("-------------------------------------------------");
+          boolean receiverEventRequired = true;
+          int newRecevierCnt;
+          for (int z = 0; z < receiverEventCntr.size(); z++) {
+            String[] receiverParts = receiverEventCntr.get(z).split(":");
+            if (receiverParts[0].equals(receiverName)){  
+              receiverEventRequired = false;
+              newRecevierCnt = Integer.parseInt(receiverParts[1]);
+              newRecevierCnt ++;
+              receiverEventCntr.set(z,receiverName+":"+newRecevierCnt);
+              System.out.println("httpStubWorker: receiverEventCntr: " + receiverName + " : " + newRecevierCnt);
+              break; // found match so stop looking  
+              
+            }
+          }
+          if (receiverEventRequired) {
+            newRecevierCnt=1;
+            receiverEventCntr.add(receiverName+":"+newRecevierCnt);
+          }
+          
+          for (int z = 0; z < receiverEventCntr.size(); z++) {
+            System.out.println("httpstubworker: " + receiverEventCntr.get(z));
+          }
+          System.out.println("-------------------------------------------------");
+          
+          
+          
+          
         /*
          * write any save to data database here
          */
@@ -428,7 +464,12 @@ public class HttpStubWorker implements Runnable {
         variableValue = processNumberType(variable);
       } else if (variable.getType().equals(STRING_TYPE)){
         variableValue = processStringType(variable);
+      } else if (variable.getType().equals(RECEIVEREVENT_COUNT_TYPE)){
+        variableValue = processReceiverCountType();
       }
+      
+      
+        
       return variableValue;
     }
            
@@ -547,7 +588,26 @@ public class HttpStubWorker implements Runnable {
       String variableValue = String.valueOf(httpProperties.getActiveThreadCount());
       return variableValue;
     }
+          
+    public String processReceiverCountType(){
+      String variableValue=null;
+      int z = 0;
+      for (z = 0; z < receiverEventCntr.size(); z++) {
+        if (z==0){
+            variableValue=receiverEventCntr.get(z);
+        } else {
+            variableValue=variableValue + " - " + receiverEventCntr.get(z);
+        }
+      }
+      if (z==0) {
+        variableValue="no receiver event found.";
+      }
+      
+        
+      return variableValue;
+    }
     
+      
     public String processContentLengthType(String responseMsg){
       String variableValue = null;
       // splitting on empty line, header in part 0, body is remainder 

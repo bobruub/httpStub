@@ -50,6 +50,10 @@ import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.security.Security;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class httpsStub {
   
   private HttpProperties httpProperties;
@@ -57,6 +61,9 @@ public class httpsStub {
   private HttpBaseLineMessage httpBaseLineMessage;
   private LogFileProperties logFileProperties;
   private static String httpVersion = "1.5";
+  
+  List<String> receiverEventsCntr = new ArrayList<String>();
+  
   
   /*
    * 1.2  09/04/2014 lanet - added some performance improvemnts
@@ -68,6 +75,7 @@ public class httpsStub {
    * 1.6  31/04/2014 lanet - added Number and String type variables
    * 1.8  07/05/2014 lanet - added wRite to xamp database server.
    * 1.9  08/05/2014 lanet - added logger to all classes
+   * 2.0  10/05/2014 lanet - counters for receiver events.
    */
   
   // Create an HTTPS Stub for a particular TCP port
@@ -269,7 +277,8 @@ ServerSocket getSslServerSocket() throws Exception
             Runnable httpStubWorker = new HttpStubWorker(clientConnection, 
                                                          httpProperties,
                                                          coreProperties,
-                                                         logger);
+                                                         logger,
+                                                         receiverEventsCntr);
             //Thread thread = new Thread(httpStubWorker);
             //thread.start();
             
